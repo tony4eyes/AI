@@ -39,8 +39,9 @@ class Normalize():
 #building AI  (policy)
         
 class Policy():
-    def __init__(self, input_size, output_size) #output_size: num of action to play
-    #perceptron: the algo: one layer neural network, matrix of weight Theta
+    def __init__(self, input_size, output_size)：:
+        #output_size: num of action to play
+        #perceptron: the algo: one layer neural network, matrix of weight Theta
         self.theta = np.zeros((output_size, input_size))
         
     def evaluate(self, input, delta = None, direction = None):
@@ -50,3 +51,6 @@ class Policy():
             return (self.theta + hp.noise*delta).dot(input)
         else:
             return (self.theta - hp.noise*delta).dot(input)
+        
+    def sample_deltas(self):
+        return [np.randn(*self.theta.shape) for _ in range(hp.nb_directions)]
