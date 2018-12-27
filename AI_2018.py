@@ -54,3 +54,9 @@ class Policy():
         
     def sample_deltas(self):
         return [np.randn(*self.theta.shape) for _ in range(hp.nb_directions)]
+    
+    def update(self, rollouts, sigma_r):
+        step = np.zeros(self.theta.shape)
+        for r_pos,r_neg, d in (rollouts):
+            step += (r_pos - r_neg) * d
+        self.theta += hp.learning_rate / (hp.nb_best_directions * sigma_r) * step
