@@ -60,3 +60,27 @@ class Policy():
         for r_pos,r_neg, d in (rollouts):
             step += (r_pos - r_neg) * d
         self.theta += hp.learning_rate / (hp.nb_best_directions * sigma_r) * step
+        
+#Exporing the policy on one specific direction and over one episode
+def explore(env, normalizer, policy, direction = None, delta = None):
+    state = env.reset()
+    done = False
+    num_plays = 0;
+    sum_rewards = 0
+    while not done and num_plays < hp.episode_length:
+        normalizer.observe(state)
+        state = normalizer.normalize(state)
+        action = policy.evaluate(state, delta, direction)
+        state, reward, done, _ = env.step(action)
+        #outlier reward, clip them between -1 and 1
+        reward = max(min(reward, 1), -1)
+        sum_rewards += reward
+        num_plays += 1
+    return sum_rewards
+
+def train(env, policy, normalizer, hp):
+    for step in range(hp.nb_steps):
+        #Initializing the perturbations deltas and the positive/negative rewards
+        deltas = policy.sample_deltas()
+        positive_rewards = [0] * hp.nb_directions
+        negative_rewards = [0] * hp.nb_directions
