@@ -84,3 +84,18 @@ def train(env, policy, normalizer, hp):
         deltas = policy.sample_deltas()
         positive_rewards = [0] * hp.nb_directions
         negative_rewards = [0] * hp.nb_directions
+        
+        #Getting the positive rewards in the positive directions
+        for k in range(hp.nb_directions):
+            positive_rewards[k] = explore(env, normalizer, policy, direction = "positive", delta  deltas[k])
+        
+        #Getting the negative rewards in negative directions
+        for k in range(hp.nb_directions):
+            negative_rewards[k] = explore(env, normalizer, policy, direction = "negative", delta  deltas[k])
+            
+        #Gathering a the positivenegative rewards to compute the std of these rewards
+        all_rewards = np.array(positive_rewards + negative_rewards)
+        sigma_r = all_rewards.std()
+        
+        #sorting the rollouts by the max (r_pos, r_neg) and seleting the best directions
+        scores = {k:max(r_pos, r_neg) for k,(r_pos, r_neg) in enumerate(zip(positive_rewards, negative_rewards))}

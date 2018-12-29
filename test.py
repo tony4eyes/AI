@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-a = [0] * 16
+x = [1, 2, 3]
+y = [4, 5, 6]
+zipped = zip(x, y)
+list(zipped)
 
-a1 = np.zeros(*a.shape)
+x2, y2 = zip(*zip(x, y))
+x == list(x2) and y == list(y2)
 
-print(a1)
