@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 x = [1, 2, 3]
-y = [4, 5, 6]
-zipped = zip(x, y)
-list(zipped)
+y = [5, 4, 6]
+d = zip(x, y)
 
-x2, y2 = zip(*zip(x, y))
-x == list(x2) and y == list(y2)
+c = enumerate(d)
 
+f = {k:max(a1, b1) for k,(a1, b1) in c}
+
+s = sorted(f.keys(), key = lambda x:f[x])
