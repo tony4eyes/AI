@@ -1,6 +1,8 @@
 #AI 2018
 import os
 import numpy as np
+import gym
+from gym import wrappers
 
 #hyper parameters
 
@@ -39,7 +41,7 @@ class Normalize():
 #building AI  (policy)
         
 class Policy():
-    def __init__(self, input_size, output_size)：:
+    def __init__(self, input_size, output_size):
         #output_size: num of action to play
         #perceptron: the algo: one layer neural network, matrix of weight Theta
         self.theta = np.zeros((output_size, input_size))
@@ -87,11 +89,11 @@ def train(env, policy, normalizer, hp):
         
         #Getting the positive rewards in the positive directions
         for k in range(hp.nb_directions):
-            positive_rewards[k] = explore(env, normalizer, policy, direction = "positive", delta  deltas[k])
+            positive_rewards[k] = explore(env, normalizer, policy, direction = "positive", delta = deltas[k])
         
         #Getting the negative rewards in negative directions
         for k in range(hp.nb_directions):
-            negative_rewards[k] = explore(env, normalizer, policy, direction = "negative", delta  deltas[k])
+            negative_rewards[k] = explore(env, normalizer, policy, direction = "negative", delta = deltas[k])
             
         #Gathering a the positivenegative rewards to compute the std of these rewards
         all_rewards = np.array(positive_rewards + negative_rewards)
@@ -104,6 +106,32 @@ def train(env, policy, normalizer, hp):
         
         rollouts = [(positive_rewards[k], negative_rewards[k], deltas[k]) for k in order]
         
+        #updating our policy
+        policy.update(rollouts, sigma_r)
         
+        #printing the final reward of the poliy after the update
         
+        reward_evaluation = explore(env, normalizer, policy)
+        print('Step: ', step, 'Reward: ', reward_evaluation)
+        
+#Running the main code
+def mkdir(base, name):
+    path = os.path.join(base, name)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+work_dir = mkdir('exp', 'brs')
+monitor_dir = mkdir(work_dir, 'monitor')
+        
+hp = Hp()
+np.random.seed(hp.seed)
+env = gym.make(hp.env_name)
+env = wrappers.Monitor(env, monitor_dir, force = True)
+nb_inputs = env.observation_space.shape[0]
+nb_outputs = env.action_space.shape[0]
+
+policy = Policy(nb_inputs, nb_outputs)
+normalizer = Normalize()
+train(env, policy, normalizer, hp)
+
         
