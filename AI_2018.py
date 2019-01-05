@@ -3,6 +3,7 @@ import os
 import numpy as np
 import gym
 from gym import wrappers
+import pybullet_envs 
 
 #hyper parameters
 
@@ -12,10 +13,11 @@ class Hp():
         self.episode_length = 1000
         self.learning_rate = 0.02
         self.nb_directions = 16
+        self.nb_best_directions = 16
         assert self.nb_best_directions <= self.nb_directions
         self.noise = 0.03
         self.seed = 1
-        self.env_name = ''
+        self.env_name = 'HalfCheetahBulletEnv-v0'
         
 #normalizing the states
         
@@ -55,7 +57,7 @@ class Policy():
             return (self.theta - hp.noise*delta).dot(input)
         
     def sample_deltas(self):
-        return [np.randn(*self.theta.shape) for _ in range(hp.nb_directions)]
+        return [np.random.randn(*self.theta.shape) for _ in range(hp.nb_directions)]
     
     def update(self, rollouts, sigma_r):
         step = np.zeros(self.theta.shape)
@@ -131,7 +133,7 @@ nb_inputs = env.observation_space.shape[0]
 nb_outputs = env.action_space.shape[0]
 
 policy = Policy(nb_inputs, nb_outputs)
-normalizer = Normalize()
+normalizer = Normalize(nb_inputs)
 train(env, policy, normalizer, hp)
 
         
